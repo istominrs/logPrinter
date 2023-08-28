@@ -27,16 +27,17 @@ void Controller::onFileSelected(const QString& filePath)
 }
 
 
-
 QVector<double> Controller::getTime() const
 {
     return this->_time;
 }
 
+
 QMap<QString, QVector<double>> Controller::getPosition() const
 {
     return this->_position;
 }
+
 
 QStringList Controller::getHeaders() const
 {

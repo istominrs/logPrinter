@@ -58,6 +58,14 @@ QVector<double> Model::parseNumbers(const QStringList &fields) const
 }
 
 
+QDateTime Model::correctDateTime(const QString &time) const
+{
+    int lastIndex = time.lastIndexOf(".");
+    QString trimmed = time.left(lastIndex + 4);
+    return QDateTime::fromString(trimmed, "yyyy-MM-dd HH:mm:ss.zzz");
+}
+
+
 void Model::parseHeaders(const QString& filePath)
 {
     if (!openFile(filePath, file, stream)) { return; }
@@ -98,38 +106,20 @@ void Model::parseTime(const QString& filePath)
         QStringList fields = stream.readLine().split(",");
 
         if (!isStringComplete(fields) || headers.size() != fields.size()) { continue; }
-
-//        QStringList times;
         times.append(fields.first());
-
-//        for (const QString& time : times)
-//        {
-//            QDateTime dateTime = QDateTime::fromString(time.chopped(3), "yyyy-MM-dd hh:mm:ss.zzz");
-
-//            if (dateTime.isValid())
-//            {
-//                QTime t = dateTime.time();
-//                timeData.append(t.msecsSinceStartOfDay());
-//            }
-//        }
     }
 
     times.removeAt(0);
     for (const QString& time : times)
     {
-        int lastIndex = time.lastIndexOf(".");
-        QString trimmed = time.left(lastIndex + 4);
-        QDateTime dateTime = QDateTime::fromString(trimmed, "yyyy-MM-dd hh:mm:ss.zzz");
-
-        if (dateTime.isValid())
+        if (correctDateTime(time).isValid())
         {
-            QTime t = dateTime.time();
+            QTime t = correctDateTime(time).time();
             timeData.append(t.msecsSinceStartOfDay());
 
         }
     }
     file.close();
-
 }
 
 

@@ -25,10 +25,11 @@ public:
     void parseHeaders(const QString& filePath);
     void parseData(const QString& filePath);
     void parseTime(const QString& filePath);
-private:
 
+private:
     bool openFile(const QString& filePath, QFile& file, QTextStream& stream) const;
     bool isStringComplete(const QStringList& fields) const;
+    QDateTime correctDateTime(const QString& time) const;
     QVector<double> parseNumbers(const QStringList& fields) const;
 
     QMap<QString, QVector<double>> positionData;
@@ -37,10 +38,6 @@ private:
 
     QFile file;
     QTextStream stream;
-
-    // Сделать нормальную проверку, а то она выводит три раза ошибка,
-    // так как в трех отдельных функциях вызывается.
-
 };
 
 

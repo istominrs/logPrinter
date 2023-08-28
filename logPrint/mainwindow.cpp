@@ -31,12 +31,12 @@ void MainWindow::printGraph()
 
     for (int i = 1; i < headers.size(); ++i)
     {
-        ui->scrollAreaWidgetContents->setMinimumHeight(400 * (i + 1));
         GraphBuilder* builder = new GraphBuilder();
         plot = builder->getCustomPlot();
         builder->build(position, headers[i], time);
         ui->gridLayout->addWidget(plot);
     }
+    ui->scrollAreaWidgetContents->setMinimumHeight(400 * headers.size());
 }
 
 
