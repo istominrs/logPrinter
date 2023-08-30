@@ -22,22 +22,26 @@ public:
     QStringList getHeaders() const;
     QMap<QString, QVector<double>> getData() const;
     QVector<double> getTimes() const;
-    void parseHeaders(const QString& filePath);
     void parseData(const QString& filePath);
-    void parseTime(const QString& filePath);
+
 
 private:
-    bool openFile(const QString& filePath, QFile& file, QTextStream& stream) const;
+    bool openFile(const QString& filePath);
     bool isStringComplete(const QStringList& fields) const;
     QDateTime correctDateTime(const QString& time) const;
     QVector<double> parseNumbers(const QStringList& fields) const;
 
-    QMap<QString, QVector<double>> positionData;
-    QStringList headers;
-    QVector<double> timeData;
+    void parseHeaders();
+    void parsePosition();
+    void parseTime();
 
-    QFile file;
-    QTextStream stream;
+    QMap<QString, QVector<double>> mPositionData;
+    QStringList mHeaders;
+    QVector<double> mTimeData;
+
+    QFile mFile;
+    QTextStream mStream;
+    QStringList mFields;
 };
 
 

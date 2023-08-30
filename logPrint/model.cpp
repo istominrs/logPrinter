@@ -6,23 +6,23 @@ Model::Model(QObject* parent)
 Model::~Model() = default;
 
 
-bool Model::openFile(const QString &filePath, QFile &file, QTextStream &stream) const
+bool Model::openFile(const QString &filePath)
 {
-    file.setFileName(filePath);
+    mFile.setFileName(filePath);
 
-    if (file.size() == 0)
-    {
-        QMessageBox::critical(nullptr, "Ошибка", "Размер файла нулевой!");
-        return false;
-    }
-
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+    if (!mFile.open(QIODevice::ReadOnly | QIODevice::Text))
     {
         QMessageBox::critical(nullptr, "Ошибка", "Не удалось открыть файл!");
         return false;
     }
 
-    stream.setDevice(&file);
+    if (mFile.size() == 0)
+    {
+        QMessageBox::critical(nullptr, "Ошибка", "Размер файла нулевой!");
+        return false;
+    }
+
+    mStream.setDevice(&mFile);
     return true;
 }
 
@@ -51,7 +51,10 @@ QVector<double> Model::parseNumbers(const QStringList &fields) const
         bool ok = false;
         double number = field.trimmed().toDouble(&ok);
 
-        if (ok) { column.append(number); }
+        if (ok)
+        {
+            column.append(number);
+        }
     }
 
     return column;
@@ -66,74 +69,89 @@ QDateTime Model::correctDateTime(const QString &time) const
 }
 
 
-void Model::parseHeaders(const QString& filePath)
-{
-    if (!openFile(filePath, file, stream)) { return; }
-
-    headers = stream.readLine().split(",");
-    file.close();
-}
-
-
 void Model::parseData(const QString &filePath)
 {
-    if (!openFile(filePath, file, stream)) { return; }
-
-    while (!stream.atEnd())
+    if (!openFile(filePath))
     {
-        QStringList fields = stream.readLine().split(",");
-
-        if (!isStringComplete(fields) || headers.size() != fields.size()) { continue; }
-
-        QVector<double> column = parseNumbers(fields);
-        for (size_t i = 0; i < column.size(); ++i)
-        {
-            positionData[headers[i + 1]].append(column[i]);
-        }
-
+        return;
     }
-    file.close();
+
+    while (!mStream.atEnd())
+    {
+        mFields.append(mStream.readLine());
+    }
+
+    parseHeaders();
+    parsePosition();
+    parseTime();
+
+    mFile.close();
 }
 
 
-void Model::parseTime(const QString& filePath)
+void Model::parseHeaders()
 {
-    if (!openFile(filePath, file, stream)) { return; }
+    mHeaders = mFields[0].split(",");
+}
 
-    QStringList times;
-    while (!stream.atEnd())
+
+void Model::parsePosition()
+{
+    for (QStringList::iterator it = mFields.begin() + 1; it != mFields.end(); ++it)
     {
-        QStringList fields = stream.readLine().split(",");
+        QStringList values = it->split(",");
 
-        if (!isStringComplete(fields) || headers.size() != fields.size()) { continue; }
-        times.append(fields.first());
-    }
-
-    times.removeAt(0);
-    for (const QString& time : times)
-    {
-        if (correctDateTime(time).isValid())
+        if (!isStringComplete(values) || mHeaders.size() != values.size())
         {
-            QTime t = correctDateTime(time).time();
-            timeData.append(t.msecsSinceStartOfDay());
+            continue;
+        }
 
+        QVector<double> column = parseNumbers(values);
+        for (size_t i = 0; i < column.size(); i++)
+        {
+            mPositionData[mHeaders[i + 1]].append(std::move(column[i]));
         }
     }
-    file.close();
+}
+
+
+void Model::parseTime()
+{
+    QStringList times;
+    for (QStringList::iterator it = mFields.begin() + 1; it != mFields.end(); ++it)
+    {
+        QStringList values = it->split(",");
+
+        if (!isStringComplete(values) || mHeaders.size() != values.size())
+        {
+            continue;
+        }
+        times.append(std::move(values.first()));
+    }
+
+    for (const QString& time : times)
+    {
+        QDateTime dateTime = correctDateTime(time);
+        if (dateTime.isValid())
+        {
+            qint64 milliseconds = dateTime.time().msecsSinceStartOfDay();
+            mTimeData.append(milliseconds);
+        }
+    }
 }
 
 
 QStringList Model::getHeaders() const
 {
-    return this->headers;
+    return this->mHeaders;
 }
 
 QMap<QString, QVector<double>> Model::getData() const
 {
-    return this->positionData;
+    return this->mPositionData;
 }
 
 QVector<double> Model::getTimes() const
 {
-    return this->timeData;
+    return this->mTimeData;
 }

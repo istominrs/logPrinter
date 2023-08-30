@@ -3,44 +3,41 @@
 Controller::Controller(QObject* parent)
     : QObject(parent)
 {
-    _model = new Model();
+    mModel = new Model();
 }
 
 Controller::~Controller()
 {
-    delete _model;
+    delete mModel;
 }
 
 
 void Controller::onFileSelected(const QString& filePath)
 {
-    _model->parseHeaders(filePath);
-    _headers = _model->getHeaders();
+    mModel->parseData(filePath);
 
-    _model->parseData(filePath);
-    _position = _model->getData();
+    mHeaders = mModel->getHeaders();
+    mPosition = mModel->getData();
+    mTime = mModel->getTimes();
 
-    _model->parseTime(filePath);
-    _time = _model->getTimes();
-
-    emit readyForBuildGraphics();
+    emit buildPlots();
 }
 
 
 QVector<double> Controller::getTime() const
 {
-    return this->_time;
+    return mTime;
 }
 
 
 QMap<QString, QVector<double>> Controller::getPosition() const
 {
-    return this->_position;
+    return mPosition;
 }
 
 
 QStringList Controller::getHeaders() const
 {
-    return this->_headers;
+    return mHeaders;
 }
 

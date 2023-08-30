@@ -14,7 +14,7 @@ public slots:
     void onFileSelected(const QString& filePath);
 
 signals:
-    void readyForBuildGraphics();
+    void buildPlots();
 
 public:
     explicit Controller(QObject* parent = nullptr);
@@ -25,11 +25,10 @@ public:
     QStringList getHeaders() const;
 
 private:
-    Model* _model = nullptr;
-
-    QVector<double> _time;
-    QMap<QString, QVector<double>> _position;
-    QStringList _headers;
+    Model* mModel = nullptr;
+    QVector<double> mTime;
+    QMap<QString, QVector<double>> mPosition;
+    QStringList mHeaders;
 };
 
 

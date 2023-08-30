@@ -26,7 +26,7 @@
          <x>0</x>
          <y>0</y>
          <width>780</width>
-         <height>536</height>
+         <height>558</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout">
@@ -63,7 +63,6 @@
    <addaction name="menu"/>
    <addaction name="menu_2"/>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
   <action name="chooseFileAction">
    <property name="text">
     <string>Выбрать файл</string>

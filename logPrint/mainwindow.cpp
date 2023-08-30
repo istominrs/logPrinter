@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -8,37 +9,34 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
 
 
-    controller = new Controller();
-    plot = new QCustomPlot();
-    connect(this, &MainWindow::fileSelected, controller, &Controller::onFileSelected);
-    connect(controller, &Controller::readyForBuildGraphics, this, &MainWindow::printGraph);
+
+    mController = new Controller();
+    connect(this, &MainWindow::fileSelected, mController, &Controller::onFileSelected);
+    connect(mController, &Controller::buildPlots, this, &MainWindow::printPlot);
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
-    delete controller;
-    delete plot;
+    delete mController;
 }
 
 
-void MainWindow::printGraph()
+void MainWindow::printPlot()
 {
-    QMap<QString, QVector<double>> position = controller->getPosition();
-    QStringList headers = controller->getHeaders();
-    QVector<double> time = controller->getTime();
-
+    QMap<QString, QVector<double>> position = mController->getPosition();
+    QStringList headers = mController->getHeaders();
+    QVector<double> time = mController->getTime();
 
     for (int i = 1; i < headers.size(); ++i)
     {
-        GraphBuilder* builder = new GraphBuilder();
-        plot = builder->getCustomPlot();
-        builder->build(position, headers[i], time);
-        ui->gridLayout->addWidget(plot);
+       std::unique_ptr<Plotter> plotter(new Plotter());
+       plotter->plotGraph(position, headers[i], time);
+       ui->gridLayout->addWidget(plotter.release());
     }
     ui->scrollAreaWidgetContents->setMinimumHeight(400 * headers.size());
-}
 
+}
 
 void MainWindow::on_chooseFileAction_triggered()
 {

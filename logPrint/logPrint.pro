@@ -3,6 +3,8 @@ QT       += core gui
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport
 
 CONFIG += c++17
+CONFIG += debug
+
 
 # You can make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
@@ -10,17 +12,17 @@ CONFIG += c++17
 
 SOURCES += \
     controller.cpp \
-    graphbuilder.cpp \
     main.cpp \
     mainwindow.cpp \
     model.cpp \
+    plotter.cpp \
     qcustomplot.cpp
 
 HEADERS += \
     controller.h \
-    graphbuilder.h \
     mainwindow.h \
     model.h \
+    plotter.h \
     qcustomplot.h
 
 FORMS += \

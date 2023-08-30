@@ -2,7 +2,7 @@
 #define MAINWINDOW_H
 
 #include "controller.h"
-#include "graphbuilder.h"
+#include "plotter.h"
 
 #include <QMainWindow>
 #include <QString>
@@ -31,12 +31,11 @@ private slots:
     void on_aboutProgramAction_triggered();
 
 public slots:
-    void printGraph();
+    void printPlot();
 
 private:
     Ui::MainWindow *ui;
 
-    Controller* controller = nullptr;
-    QCustomPlot* plot = nullptr;
+    Controller* mController = nullptr;
 };
 #endif // MAINWINDOW_H
