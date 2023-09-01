@@ -34,8 +34,8 @@ void MainWindow::printPlot()
        plotter->plotGraph(position, headers[i], time);
        ui->gridLayout->addWidget(plotter.release());
     }
-    ui->scrollAreaWidgetContents->setMinimumHeight(400 * headers.size());
 
+    ui->scrollAreaWidgetContents->setMinimumHeight(400 * headers.size());
 }
 
 void MainWindow::on_chooseFileAction_triggered()

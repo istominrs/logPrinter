@@ -12,14 +12,12 @@ public:
     explicit Plotter(QWidget* parent = nullptr);
     ~Plotter();
 
-
     void plotGraph(QMap<QString, QVector<double>>& position, const QString& header, const QVector<double>& time);
-
-
 
 private slots:
     void onMouseMoveEvent(QMouseEvent* event);
     void onXRangeChanged(const QCPRange& range);
+//    void onChangeScaleOfTime(const QCPRange& range);
 
 private:
     QCPItemTracer* mTracer = nullptr;

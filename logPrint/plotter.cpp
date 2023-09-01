@@ -10,6 +10,7 @@ Plotter::Plotter(QWidget* parent)
 
     connect(this, &QCustomPlot::mouseMove, this, &Plotter::onMouseMoveEvent);
     connect(xAxis, static_cast<void(QCPAxis::*)(const QCPRange&)>(&QCPAxis::rangeChanged), this, &Plotter::onXRangeChanged);
+//    connect(xAxis, static_cast<void(QCPAxis::*)(const QCPRange&)>(&QCPAxis::rangeChanged), this, &Plotter::onChangeScaleOfTime);
 }
 
 Plotter::~Plotter()
@@ -23,18 +24,17 @@ Plotter::~Plotter()
 
 void Plotter::plotGraph(QMap<QString, QVector<double>> &position, const QString &header, const QVector<double> &time)
 {
+    addGraph();
     mMinValueX = *std::min_element(time.begin(), time.end());
     mMaxValueX = *std::max_element(time.begin(), time.end());
 
 
-    addGraph();
+    QSharedPointer<QCPAxisTickerTime> dateTicker(new QCPAxisTickerTime);
+    dateTicker->setTimeFormat("%h:%m:%s:%z");
+
+
     graph()->setData(time, position[header]);
     graph()->setPen(QPen(QColor("green")));
-
-
-    QSharedPointer<QCPAxisTickerDateTime> dateTicker(new QCPAxisTickerDateTime);
-    dateTicker->setDateTimeFormat("HH:mm:ss.zzz");
-    dateTicker->setDateTimeSpec(Qt::TimeSpec::LocalTime);
 
 
     xAxis->setTicker(dateTicker);
@@ -44,7 +44,6 @@ void Plotter::plotGraph(QMap<QString, QVector<double>> &position, const QString 
 
 
     addTitle(header);
-
 
     setInteractions(QCP::iRangeZoom | QCP::iRangeDrag);
 
@@ -78,8 +77,10 @@ void Plotter::onMouseMoveEvent(QMouseEvent* event)
         double xTracerCoord = tracerCoords.x();
         double yTracerCoord = tracerCoords.y();
 
-        QTime time = QTime(0, 0).addMSecs(static_cast<int>(xTracerCoord));
-        QString formattedTime = time.toString("HH:mm:ss.zzz");
+        QDateTime dateTime = QDateTime::currentDateTime();
+        dateTime.setTime(QTime(0, 0).addMSecs(qRound(xTracerCoord * 1000)));
+
+        QString formattedTime = dateTime.toString("hh:mm:ss.zzz");
         customizeLabel(xTracerCoord, yTracerCoord, formattedTime);
 
         mTracer->setVisible(true);
@@ -90,8 +91,9 @@ void Plotter::onMouseMoveEvent(QMouseEvent* event)
         mTracer->setVisible(false);
         mLabel->setVisible(false);
     }
-    replot();
 
+
+    replot();
 }
 
 
@@ -114,7 +116,7 @@ void Plotter::customizeLabel(const double coordX, const double coordY, const QSt
 {
     mLabel->setPositionAlignment(Qt::AlignLeading | Qt::AlignBottom);
     mLabel->position->setCoords(coordX, coordY);
-    mLabel->setText(QString("Time %1 | Position %2").arg(formattedTime).arg(coordY));
+    mLabel->setText(QString("%1 | %2").arg(formattedTime).arg(coordY));
 }
 
 
@@ -140,3 +142,16 @@ void Plotter::onXRangeChanged(const QCPRange& range)
 }
 
 
+//void Plotter::onChangeScaleOfTime(const QCPRange& range)
+//{
+//    QSharedPointer<QCPAxisTickerDateTime> dateTicker(new QCPAxisTickerDateTime);
+//    if (range.size() <= 33200)
+//    {
+//        dateTicker->setDateTimeFormat("HH:mm:ss.zzz");
+//    }
+//    else
+//    {
+//        dateTicker->setDateTimeFormat("yyyy-MM-dd HH:mm:ss.zzz");
+//    }
+//    xAxis->setTicker(dateTicker);
+//}

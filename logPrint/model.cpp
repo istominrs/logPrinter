@@ -1,5 +1,6 @@
 #include "model.h"
 
+
 Model::Model(QObject* parent)
     : QObject(parent) {}
 
@@ -69,6 +70,12 @@ QDateTime Model::correctDateTime(const QString &time) const
 }
 
 
+bool Model::isRadianWordInHeader(const QString &header) const
+{
+    return header.indexOf("rad") != -1 ? true : false;
+}
+
+
 void Model::parseData(const QString &filePath)
 {
     if (!openFile(filePath))
@@ -83,6 +90,7 @@ void Model::parseData(const QString &filePath)
 
     parseHeaders();
     parsePosition();
+    radiansToDegrees();
     parseTime();
 
     mFile.close();
@@ -115,6 +123,30 @@ void Model::parsePosition()
 }
 
 
+void Model::radiansToDegrees()
+{
+    for (const QString& header : mHeaders)
+    {
+        if (isRadianWordInHeader(header))
+        {
+            mPositionData[header] = convertUnits(mPositionData[header]);
+        }
+    }
+}
+
+
+QVector<double> Model::convertUnits(const QVector<double> &position) const
+{
+    QVector<double> newData;
+    for (const double& pos : position)
+    {
+        newData.append(RAD_TO_DEG(pos));
+    }
+
+    return newData;
+}
+
+
 void Model::parseTime()
 {
     QStringList times;
@@ -129,15 +161,31 @@ void Model::parseTime()
         times.append(std::move(values.first()));
     }
 
+
     for (const QString& time : times)
     {
         QDateTime dateTime = correctDateTime(time);
         if (dateTime.isValid())
         {
-            qint64 milliseconds = dateTime.time().msecsSinceStartOfDay();
-            mTimeData.append(milliseconds);
+            QString formattedTime = dateTime.toString("hh:mm:ss.zzz");
+           mTimeData.append(convertTimeInDecimalSeconds(formattedTime));
         }
     }
+}
+
+
+double Model::convertTimeInDecimalSeconds(const QString &time) const
+{
+    double hours, minutes, seconds, milliseconds;
+
+    QStringList timeList = time.split(":");
+    hours = timeList[0].toDouble();
+    minutes = timeList[1].toDouble();
+    QStringList secondsParts = timeList[2].split(".");
+    seconds = secondsParts[0].toDouble();
+    milliseconds = secondsParts[1].toDouble();
+
+    return (hours * 3600) + (minutes * 60) + seconds + (milliseconds / 1000.0);
 }
 
 
