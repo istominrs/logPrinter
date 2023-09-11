@@ -10,7 +10,6 @@ Plotter::Plotter(QWidget* parent)
 
     connect(this, &QCustomPlot::mouseMove, this, &Plotter::onMouseMoveEvent);
     connect(xAxis, static_cast<void(QCPAxis::*)(const QCPRange&)>(&QCPAxis::rangeChanged), this, &Plotter::onXRangeChanged);
-//    connect(xAxis, static_cast<void(QCPAxis::*)(const QCPRange&)>(&QCPAxis::rangeChanged), this, &Plotter::onChangeScaleOfTime);
 }
 
 Plotter::~Plotter()
@@ -140,18 +139,3 @@ void Plotter::onXRangeChanged(const QCPRange& range)
 
     xAxis->setRange(boundedRange);
 }
-
-
-//void Plotter::onChangeScaleOfTime(const QCPRange& range)
-//{
-//    QSharedPointer<QCPAxisTickerDateTime> dateTicker(new QCPAxisTickerDateTime);
-//    if (range.size() <= 33200)
-//    {
-//        dateTicker->setDateTimeFormat("HH:mm:ss.zzz");
-//    }
-//    else
-//    {
-//        dateTicker->setDateTimeFormat("yyyy-MM-dd HH:mm:ss.zzz");
-//    }
-//    xAxis->setTicker(dateTicker);
-//}
