@@ -17,7 +17,6 @@ public:
 private slots:
     void onMouseMoveEvent(QMouseEvent* event);
     void onXRangeChanged(const QCPRange& range);
-//    void onChangeScaleOfTime(const QCPRange& range);
 
 private:
     QCPItemTracer* mTracer = nullptr;
