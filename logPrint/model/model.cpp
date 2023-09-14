@@ -72,7 +72,7 @@ QDateTime Model::correctDateTime(const QString &time) const
 
 bool Model::isRadianWordInHeader(const QString &header) const
 {
-    return header.indexOf("rad") != -1 ? true : false;
+    return header.indexOf("[rad]") != -1 ? true : false;
 }
 
 
@@ -99,7 +99,16 @@ void Model::parseData(const QString &filePath)
 
 void Model::parseHeaders()
 {
-    mHeaders = mFields[0].split(",");
+    QStringList oldHeaders = mFields[0].split(",");
+    for (QString& el : oldHeaders)
+    {
+        if (isRadianWordInHeader(el))
+        {
+            el.replace(el.indexOf("[rad]"), 5, "[deg]");
+
+        }
+        mHeaders.append(el);
+    }
 }
 
 
