@@ -99,7 +99,7 @@ void Plotter::onMouseMoveEvent(QMouseEvent* event)
 void Plotter::customizeTracer(const double coordX, const double coordY)
 {
     mTracer->setGraph(graph());
-    mTracer->setStyle(QCPItemTracer::tsCircle);
+    mTracer->setStyle(QCPItemTracer::tsCrosshair);
     mTracer->position->setType(QCPItemPosition::ptPlotCoords);
     mTracer->position->setCoords(coordX, coordY);
     mTracer->setGraphKey(coordX);
